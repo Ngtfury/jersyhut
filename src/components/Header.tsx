@@ -1,6 +1,11 @@
+"use client";
+
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
 
 export default function Header() {
+  const { totalItems, setIsOpen } = useCart();
+
   return (
     <header className="w-full z-50 bg-black font-sans">
       {/* Top Countdown Bar */}
@@ -56,9 +61,16 @@ export default function Header() {
             <button className="text-white hover:text-gray-300 transition">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             </button>
-            <button className="text-white hover:text-gray-300 transition relative">
+            <button 
+              onClick={() => setIsOpen(true)}
+              className="text-white hover:text-gray-300 transition relative cursor-pointer"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-              {/* Optional: Add badge here if items exist */}
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-white text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </button>
           </div>
         </div>

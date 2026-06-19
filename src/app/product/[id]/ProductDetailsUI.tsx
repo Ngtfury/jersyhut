@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Product } from '@/types';
+import { useCart } from '@/context/CartContext';
 
 interface ProductDetailsUIProps {
   product: Product;
@@ -11,6 +12,7 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const { addToCart } = useCart();
 
   const teamMatch = product.name.match(/(?<=\| ).*?(?= \d{4})/);
   const team = teamMatch ? teamMatch[0] : 'N/A';
@@ -53,7 +55,7 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
       <div className="flex justify-end mb-4">
         <button 
           onClick={() => setShowSizeChart(true)}
-          className="flex items-center gap-2 text-[10px] text-white hover:text-white/70 tracking-widest border border-white/20 px-3 py-1 uppercase cursor-pointer transition-colors"
+          className="flex items-center gap-2 text-[10px] text-white hover:text-white/70 tracking-widest border border-white/20 rounded-full px-4 py-2 uppercase cursor-pointer transition-colors"
         >
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeWidth="2"></rect><line x1="3" y1="9" x2="21" y2="9" strokeWidth="2"></line><line x1="9" y1="21" x2="9" y2="9" strokeWidth="2"></line></svg>
           SIZECHART
@@ -88,27 +90,23 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
               
             const isSelected = selectedSize === size;
             return (
-              <div key={size} className="flex flex-col items-center gap-1">
-                <button 
-                  disabled={!isAvailable}
-                  onClick={() => setSelectedSize(size)}
-                  className={`
-                    w-14 h-10 border flex items-center justify-center text-xs font-bold transition
-                    ${isAvailable ? 'cursor-pointer hover:border-white' : 'opacity-30 cursor-not-allowed line-through'}
-                    ${isSelected ? 'bg-white text-black border-white' : 'bg-transparent text-white border-white/20'}
-                  `}
-                >
-                  {size}
-                </button>
-                {/* Always show remaining stock below the button if it's 5 or less */}
-                <div className="h-4 flex items-center justify-center">
-                  {isAvailable && sizeStock !== undefined && sizeStock <= 5 && (
-                    <span className="text-[10px] text-red-400 font-bold tracking-widest animate-in fade-in">
-                      {sizeStock} left
-                    </span>
-                  )}
-                </div>
-              </div>
+              <button 
+                key={size} 
+                disabled={!isAvailable}
+                onClick={() => setSelectedSize(size)}
+                className={`
+                  w-14 h-10 rounded-full flex items-center justify-center text-xs font-bold transition relative
+                  ${isAvailable ? 'cursor-pointer hover:border-white' : 'opacity-50 cursor-not-allowed'}
+                  ${isSelected ? 'bg-white text-black' : 'bg-transparent text-white border border-white/20'}
+                `}
+              >
+                {size}
+                {!isAvailable && (
+                  <div className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none">
+                    <div className="w-[120%] h-px bg-white/50 rotate-[-30deg]" />
+                  </div>
+                )}
+              </button>
             );
           })}
         </div>
@@ -117,24 +115,33 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
       {/* Add to Cart Section */}
       <div className="flex gap-4 mb-12 h-12">
         {/* Quantity Selector */}
-        <div className="flex items-center border border-white/20 w-32">
+        <div className="flex items-center bg-[#e0e0e0] text-black rounded-full w-32 overflow-hidden">
           <button 
             onClick={() => setQuantity(q => Math.max(1, q - 1))}
-            className="w-10 h-full flex items-center justify-center hover:bg-white/10 transition cursor-pointer"
+            className="w-10 h-full flex items-center justify-center hover:bg-black/5 transition cursor-pointer text-black/50 hover:text-black"
           >
             -
           </button>
           <span className="flex-1 text-center text-sm font-bold">{quantity}</span>
           <button 
-            onClick={() => setQuantity(q => Math.min(stockForSelected || 99, q + 1))}
-            className="w-10 h-full flex items-center justify-center hover:bg-white/10 transition cursor-pointer"
+            onClick={() => setQuantity(q => q + 1)}
+            className="w-10 h-full flex items-center justify-center hover:bg-black/5 transition cursor-pointer text-black/50 hover:text-black"
           >
             +
           </button>
         </div>
         
         {/* Add to Cart Button */}
-        <button className="flex-1 bg-white text-black font-bold text-xs hover:bg-zinc-200 transition uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer">
+        <button 
+          onClick={() => {
+            if (!selectedSize) {
+              alert("Please select a size before adding to cart.");
+              return;
+            }
+            addToCart(product, selectedSize, quantity);
+          }}
+          className="flex-1 bg-white text-black rounded-full font-bold text-xs hover:bg-zinc-200 transition uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
           Add to cart
         </button>

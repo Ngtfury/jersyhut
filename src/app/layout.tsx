@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   description: "Get high-quality, affordable kits with fast shipping and secure checkout. Perfect for every fan!",
 };
 
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +30,12 @@ export default function RootLayout({
       lang="en"
       className={`${josefinSans.variable} ${inter.variable} antialiased h-full`}
     >
-      <body className="min-h-full flex flex-col bg-black text-white font-sans">{children}</body>
+      <body className="min-h-full flex flex-col bg-black text-white font-sans">
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
+      </body>
     </html>
   );
 }
