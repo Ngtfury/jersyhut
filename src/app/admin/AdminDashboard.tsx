@@ -13,6 +13,7 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
   const [editingId, setEditingId] = useState<string | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>(['S', 'M', 'L', 'XL', '2XL']);
+  const [stock, setStock] = useState<Record<string, number>>({});
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,7 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
     setEditingId(null);
     setImages([]);
     setSizes(['S', 'M', 'L', 'XL', '2XL']);
+    setStock({});
     setError('');
   };
 
@@ -32,6 +34,7 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
     setEditingId(product.id);
     setImages(product.images || []);
     setSizes(product.sizes || []);
+    setStock(product.stock_per_size || {});
     setActiveTab('ADD');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -61,9 +64,18 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
   };
 
   const toggleSize = (size: string) => {
-    setSizes(prev => 
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-    );
+    setSizes(prev => {
+      if (prev.includes(size)) {
+        setStock(s => { const newS = {...s}; delete newS[size]; return newS; });
+        return prev.filter(s => s !== size);
+      } else {
+        return [...prev, size];
+      }
+    });
+  };
+
+  const updateStock = (size: string, value: string) => {
+    setStock(s => ({...s, [size]: Number(value)}));
   };
 
   const handleSubmit = async (formData: FormData) => {
@@ -80,6 +92,8 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
     // Clear the sizes from FormData and append manually since we control it via state
     formData.delete('sizes');
     sizes.forEach(size => formData.append('sizes', size));
+    
+    formData.append('stock_per_size', JSON.stringify(stock));
 
     try {
       if (editingId) {
@@ -141,7 +155,7 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
                 className="flex-1 py-3 border border-white/20 rounded hover:bg-white/5 transition font-bold cursor-pointer"
                 disabled={isLoading}
               >
-                Cancel
+                 Cancel
               </button>
               <button 
                 onClick={handleDeleteConfirm}
@@ -300,19 +314,34 @@ export default function AdminDashboard({ initialProducts }: { initialProducts: P
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm text-white/70 mb-2">Available Sizes</label>
-                <div className="flex gap-4">
-                  {['S', 'M', 'L', 'XL', '2XL'].map(size => (
-                    <label key={size} className="flex items-center gap-2 cursor-pointer bg-black px-3 py-2 border border-white/10 rounded">
-                      <input 
-                        type="checkbox" 
-                        checked={sizes.includes(size)}
-                        onChange={() => toggleSize(size)}
-                        className="w-4 h-4 accent-white cursor-pointer" 
-                      />
-                      <span className="font-bold">{size}</span>
-                    </label>
-                  ))}
+                <label className="block text-sm text-white/70 mb-2">Inventory Stock & Availability</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {['S', 'M', 'L', 'XL', '2XL'].map(size => {
+                    const isChecked = sizes.includes(size);
+                    return (
+                      <div key={size} className={`flex items-center gap-3 bg-black px-3 py-2 border rounded transition-colors ${isChecked ? 'border-white/40' : 'border-white/10 opacity-50'}`}>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={isChecked}
+                            onChange={() => toggleSize(size)}
+                            className="w-4 h-4 accent-white cursor-pointer" 
+                          />
+                          <span className="font-bold w-6">{size}</span>
+                        </label>
+                        {isChecked && (
+                          <input 
+                            type="number"
+                            min="0"
+                            placeholder="Qty"
+                            value={stock[size] !== undefined ? stock[size] : ''}
+                            onChange={(e) => updateStock(size, e.target.value)}
+                            className="w-full bg-transparent border-b border-white/20 text-white text-sm focus:outline-none focus:border-white px-1 py-1"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
