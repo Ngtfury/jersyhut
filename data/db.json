@@ -1,0 +1,108 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "CR7 | REAL MADRID 2011-12 HOME",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "BEST SELLERS",
+      "badge": "SAVE 28%"
+    },
+    {
+      "id": "2",
+      "name": "PRE BOOKING - CR7 | PORTUGAL PANTHER EDITION",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "BEST SELLERS",
+      "badge": "SAVE 28%"
+    },
+    {
+      "id": "3",
+      "name": "CR7 | GOAT EDITION",
+      "price": 449,
+      "originalPrice": 799,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "BEST SELLERS",
+      "badge": "SAVE 43%"
+    },
+    {
+      "id": "4",
+      "name": "CR7 | MANCHESTER UNITED 2007 - 08 HOME",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "BEST SELLERS",
+      "badge": "SAVE 28%"
+    },
+    {
+      "id": "5",
+      "name": "BLUE EMIRATES FLY BETTER KIT",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "FRESH KITS",
+      "badge": "SALE"
+    },
+    {
+      "id": "6",
+      "name": "BRAZIL AWAY KIT",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "FRESH KITS",
+      "badge": "SALE"
+    },
+    {
+      "id": "7",
+      "name": "PORTUGAL HOME KIT",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "FRESH KITS",
+      "badge": "SALE"
+    },
+    {
+      "id": "8",
+      "name": "ARSENAL BLUE GOLD KIT",
+      "price": 499,
+      "originalPrice": 699,
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533",
+      "category": "FRESH KITS",
+      "badge": "SALE"
+    }
+  ],
+  "categories": [
+    {
+      "id": "c1",
+      "name": "CR7",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    },
+    {
+      "id": "c2",
+      "name": "LIONEL MESSI",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    },
+    {
+      "id": "c3",
+      "name": "BECKHAM",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    },
+    {
+      "id": "c4",
+      "name": "KAKA",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    },
+    {
+      "id": "c5",
+      "name": "MALDINI",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    },
+    {
+      "id": "c6",
+      "name": "NEYMAR",
+      "image": "https://jerseyhut.in/cdn/shop/files/Screenshot_2025-05-27-21-12-19-89.jpg?v=1748629334&width=533"
+    }
+  ]
+}
