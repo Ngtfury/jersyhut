@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Product } from "@/types";
 
 interface ProductCardProps {
@@ -5,9 +6,12 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  // Use the first image from the array if available, otherwise fallback to empty string
+  const imageUrl = product.images && product.images.length > 0 ? product.images[0] : '';
+
   return (
-    <div className="flex flex-col group cursor-pointer w-full bg-black relative">
-      <div className="relative aspect-square md:aspect-[4/5] bg-black overflow-hidden mb-4 flex items-center justify-center">
+    <Link href={`/product/${product.id}`} className="flex flex-col group cursor-pointer w-full bg-black relative">
+      <div className="relative aspect-square md:aspect-[4/5] bg-black overflow-hidden mb-4 flex items-center justify-center border border-white/5">
         {product.badge && (
           <div className="absolute top-2 right-2 z-10 text-white text-[9px] md:text-[10px] font-bold uppercase tracking-wider">
             {product.badge}
@@ -15,7 +19,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
         <div 
           className="w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-105"
-          style={{ backgroundImage: `url(${product.image})` }}
+          style={{ backgroundImage: `url(${imageUrl})` }}
         />
       </div>
       <div className="flex flex-col text-center px-1">
@@ -24,11 +28,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
         <div className="flex justify-center items-center gap-2">
           <span className="text-[11px] md:text-xs text-white font-bold">Rs. {product.price.toFixed(2)}</span>
-          {product.originalPrice && (
-            <span className="text-[10px] md:text-[11px] text-white/40 line-through">Rs. {product.originalPrice.toFixed(2)}</span>
+          {product.original_price && (
+            <span className="text-[10px] md:text-[11px] text-white/40 line-through">Rs. {product.original_price.toFixed(2)}</span>
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

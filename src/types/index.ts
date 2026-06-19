@@ -1,12 +1,13 @@
 export interface Product {
-  id: string;
+  id: string; // UUID from Supabase
   name: string;
   price: number;
-  originalPrice?: number;
-  image: string;
+  original_price?: number | null;
   category: string;
-  type?: string;
-  badge?: string;
+  badge?: string | null;
+  sizes: string[];
+  images: string[];
+  created_at?: string;
 }
 
 export interface Category {
@@ -15,6 +16,7 @@ export interface Category {
   image: string;
 }
 
+// Keeping this around for fallback/migration context
 export interface Database {
   products: Product[];
   categories: Category[];

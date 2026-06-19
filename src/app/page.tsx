@@ -1,29 +1,25 @@
-import fs from 'fs';
-import path from 'path';
+import { supabaseAdmin } from '@/lib/supabase';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import IconsSection from '@/components/IconsSection';
 import ProductCarousel from '@/components/ProductCarousel';
 import ProductGrid from '@/components/ProductGrid';
 import Footer from '@/components/Footer';
-import { Database } from '@/types';
 
-async function getData(): Promise<Database> {
-  const filePath = path.join(process.cwd(), 'data', 'db.json');
-  try {
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContents) as Database;
-  } catch (error) {
-    console.error("Error reading db.json", error);
-    return { products: [], categories: [] };
-  }
-}
+export const dynamic = 'force-dynamic'; // Ensure Next.js never caches this page
 
 export default async function Home() {
-  const { products, categories } = await getData();
+  // Use supabaseAdmin to bypass any potential Row Level Security issues
+  const { data: products, error } = await supabaseAdmin
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-  const bestSellers = products.filter(p => p.category === 'BEST SELLERS');
-  const freshKits = products.filter(p => p.category === 'FRESH KITS');
+  if (error) {
+    console.error("Error fetching products:", error);
+  }
+
+  const allProducts = products || [];
+  const freshKits = allProducts.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-black">
@@ -31,15 +27,10 @@ export default async function Home() {
       <main>
         <Hero />
         
-        {bestSellers.length > 0 && (
-          <ProductCarousel 
-            products={bestSellers} 
-            tabs={['BEST SELLERS', 'FULL SLEEVES', 'HALF SLEEVES', 'OVERSIZED T', 'SHORTS']} 
-          />
-        )}
-        
-        {categories.length > 0 && <IconsSection categories={categories} />}
+        {/* Interactive Collections Carousel */}
+        <ProductCarousel products={allProducts} />
 
+        {/* Fresh Kits Section */}
         {freshKits.length > 0 && (
           <ProductGrid 
             title="FRESH KITS" 

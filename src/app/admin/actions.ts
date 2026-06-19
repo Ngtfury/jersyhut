@@ -1,69 +1,82 @@
 "use server";
 
-import fs from 'fs';
-import path from 'path';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
-import { Database, Product } from '@/types';
-
-const filePath = path.join(process.cwd(), 'data', 'db.json');
-
-const productSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  price: z.coerce.number().min(0, "Price must be positive"),
-  originalPrice: z.coerce.number().optional(),
-  image: z.string().url("Must be a valid URL"),
-  category: z.string().min(1, "Category is required"),
-  type: z.string().optional(),
-  badge: z.string().optional(),
-});
-
-export async function getDbData(): Promise<Database> {
-  try {
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContents) as Database;
-  } catch (error) {
-    console.error("Error reading db.json", error);
-    return { products: [], categories: [] };
-  }
-}
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function addProduct(formData: FormData) {
-  const parsed = productSchema.safeParse({
-    name: formData.get('name'),
-    price: formData.get('price'),
-    originalPrice: formData.get('originalPrice') || undefined,
-    image: formData.get('image'),
-    category: formData.get('category'),
-    type: formData.get('type') || undefined,
-    badge: formData.get('badge') || undefined,
-  });
+  const name = formData.get('name') as string;
+  const price = Number(formData.get('price'));
+  const originalPrice = formData.get('originalPrice') ? Number(formData.get('originalPrice')) : null;
+  const category = formData.get('category') as string;
+  const badge = formData.get('badge') as string || null;
+  const sizes = formData.getAll('sizes') as string[];
+  const images = JSON.parse(formData.get('images') as string || '[]');
 
-  if (!parsed.success) {
-    throw new Error(parsed.error.errors[0].message);
+  if (!name || !price || !category || images.length === 0) {
+    throw new Error('Missing required fields');
   }
 
-  const newProduct: Product = {
-    id: Date.now().toString(),
-    ...parsed.data
-  };
+  const { error } = await supabaseAdmin.from('products').insert({
+    name,
+    price,
+    original_price: originalPrice,
+    category,
+    badge,
+    sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL'],
+    images
+  });
 
-  const data = await getDbData();
-  data.products.push(newProduct);
-  
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  if (error) {
+    throw new Error(error.message);
+  }
+
   revalidatePath('/');
+  revalidatePath(`/collections/${category.toLowerCase().replace(' ', '-')}`);
   revalidatePath('/admin');
 }
 
-export async function deleteProduct(formData: FormData) {
-  const id = formData.get('id') as string;
+export async function updateProduct(id: string, formData: FormData) {
+  const name = formData.get('name') as string;
+  const price = Number(formData.get('price'));
+  const originalPrice = formData.get('originalPrice') ? Number(formData.get('originalPrice')) : null;
+  const category = formData.get('category') as string;
+  const badge = formData.get('badge') as string || null;
+  const sizes = formData.getAll('sizes') as string[];
+  const images = JSON.parse(formData.get('images') as string || '[]');
+
+  if (!id || !name || !price || !category || images.length === 0) {
+    throw new Error('Missing required fields');
+  }
+
+  const { error } = await supabaseAdmin.from('products').update({
+    name,
+    price,
+    original_price: originalPrice,
+    category,
+    badge,
+    sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL'],
+    images
+  }).eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath('/');
+  revalidatePath(`/collections/${category.toLowerCase().replace(' ', '-')}`);
+  revalidatePath(`/product/${id}`);
+  revalidatePath('/admin');
+}
+
+export async function deleteProduct(id: string) {
   if (!id) return;
 
-  const data = await getDbData();
-  data.products = data.products.filter(p => p.id !== id);
+  const { error } = await supabaseAdmin.from('products').delete().eq('id', id);
   
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  if (error) {
+    throw new Error(error.message);
+  }
+
   revalidatePath('/');
   revalidatePath('/admin');
 }
