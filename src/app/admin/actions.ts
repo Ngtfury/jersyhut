@@ -11,6 +11,7 @@ export async function addProduct(formData: FormData) {
   const badge = formData.get('badge') as string || null;
   const sizes = formData.getAll('sizes') as string[];
   const images = JSON.parse(formData.get('images') as string || '[]');
+  const stock_per_size = JSON.parse(formData.get('stock_per_size') as string || '{}');
 
   if (!name || !price || !category || images.length === 0) {
     throw new Error('Missing required fields');
@@ -23,7 +24,8 @@ export async function addProduct(formData: FormData) {
     category,
     badge,
     sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL'],
-    images
+    images,
+    stock_per_size
   });
 
   if (error) {
@@ -43,6 +45,7 @@ export async function updateProduct(id: string, formData: FormData) {
   const badge = formData.get('badge') as string || null;
   const sizes = formData.getAll('sizes') as string[];
   const images = JSON.parse(formData.get('images') as string || '[]');
+  const stock_per_size = JSON.parse(formData.get('stock_per_size') as string || '{}');
 
   if (!id || !name || !price || !category || images.length === 0) {
     throw new Error('Missing required fields');
@@ -55,7 +58,8 @@ export async function updateProduct(id: string, formData: FormData) {
     category,
     badge,
     sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL'],
-    images
+    images,
+    stock_per_size
   }).eq('id', id);
 
   if (error) {

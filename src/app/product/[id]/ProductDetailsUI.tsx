@@ -18,6 +18,11 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
   const team = teamMatch ? teamMatch[0] : 'N/A';
   const playerMatch = product.name.match(/^.*?(?=\s\|)/);
   const player = playerMatch ? playerMatch[0] : 'N/A';
+
+  // Determine stock text
+  const stockForSelected = selectedSize && product.stock_per_size && product.stock_per_size[selectedSize] !== undefined 
+    ? product.stock_per_size[selectedSize] 
+    : undefined;
   
   return (
     <div className="flex flex-col pt-2 font-sans relative">
@@ -77,7 +82,12 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           {['S', 'M', 'L', 'XL', '2XL'].map(size => {
-            const isAvailable = product.sizes?.includes(size);
+            const sizeStock = product.stock_per_size ? product.stock_per_size[size] : undefined;
+            // If stock_per_size exists, use it. Otherwise fallback to sizes array.
+            const isAvailable = product.stock_per_size 
+              ? sizeStock !== undefined && sizeStock > 0 
+              : product.sizes?.includes(size);
+              
             const isSelected = selectedSize === size;
             return (
               <button 
