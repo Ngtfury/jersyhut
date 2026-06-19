@@ -16,6 +16,11 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
   const team = teamMatch ? teamMatch[0] : 'N/A';
   const playerMatch = product.name.match(/^.*?(?=\s\|)/);
   const player = playerMatch ? playerMatch[0] : 'N/A';
+
+  // Determine stock text
+  const stockForSelected = selectedSize && product.stock_per_size && product.stock_per_size[selectedSize] !== undefined 
+    ? product.stock_per_size[selectedSize] 
+    : undefined;
   
   return (
     <div className="flex flex-col pt-2 font-sans relative">
@@ -75,21 +80,35 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           {['S', 'M', 'L', 'XL', '2XL'].map(size => {
-            const isAvailable = product.sizes?.includes(size);
+            const sizeStock = product.stock_per_size ? product.stock_per_size[size] : undefined;
+            // If stock_per_size exists, use it. Otherwise fallback to sizes array.
+            const isAvailable = product.stock_per_size 
+              ? sizeStock !== undefined && sizeStock > 0 
+              : product.sizes?.includes(size);
+              
             const isSelected = selectedSize === size;
             return (
-              <button 
-                key={size} 
-                disabled={!isAvailable}
-                onClick={() => setSelectedSize(size)}
-                className={`
-                  w-14 h-10 border flex items-center justify-center text-xs font-bold transition
-                  ${isAvailable ? 'cursor-pointer hover:border-white' : 'opacity-30 cursor-not-allowed line-through'}
-                  ${isSelected ? 'bg-white text-black border-white' : 'bg-transparent text-white border-white/20'}
-                `}
-              >
-                {size}
-              </button>
+              <div key={size} className="flex flex-col items-center gap-1">
+                <button 
+                  disabled={!isAvailable}
+                  onClick={() => setSelectedSize(size)}
+                  className={`
+                    w-14 h-10 border flex items-center justify-center text-xs font-bold transition
+                    ${isAvailable ? 'cursor-pointer hover:border-white' : 'opacity-30 cursor-not-allowed line-through'}
+                    ${isSelected ? 'bg-white text-black border-white' : 'bg-transparent text-white border-white/20'}
+                  `}
+                >
+                  {size}
+                </button>
+                {/* Always show remaining stock below the button if it's 5 or less */}
+                <div className="h-4 flex items-center justify-center">
+                  {isAvailable && sizeStock !== undefined && sizeStock <= 5 && (
+                    <span className="text-[10px] text-red-400 font-bold tracking-widest animate-in fade-in">
+                      {sizeStock} left
+                    </span>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
@@ -107,7 +126,7 @@ export default function ProductDetailsUI({ product }: ProductDetailsUIProps) {
           </button>
           <span className="flex-1 text-center text-sm font-bold">{quantity}</span>
           <button 
-            onClick={() => setQuantity(q => q + 1)}
+            onClick={() => setQuantity(q => Math.min(stockForSelected || 99, q + 1))}
             className="w-10 h-full flex items-center justify-center hover:bg-white/10 transition cursor-pointer"
           >
             +
